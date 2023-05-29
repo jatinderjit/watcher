@@ -7,3 +7,8 @@ file changes.
 watcher /path/to/file /path/to/dir -- echo "something changed"
 ```
 
+## Similar
+
+- [entr](https://github.com/eradman/entr/)
+- [anko](https://github.com/GuilhermeCaruso/anko)
+- [gaper](https://github.com/maxcnunes/gaper)

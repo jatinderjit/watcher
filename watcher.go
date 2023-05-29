@@ -12,8 +12,7 @@ import (
 )
 
 const usage = `Usage:
-
-watcher /path/to/file /path/to/dir -- echo "something changed"`
+    watcher /path/to/file /path/to/dir -- echo "something changed"`
 
 func parseArgs(args []string) ([]string, string, error) {
 	paths := []string{}
@@ -51,15 +50,22 @@ func escape(arg string) string {
 }
 
 func main() {
+	if len(os.Args) == 2 && os.Args[1] == "--help" {
+		fmt.Println(usage)
+		return
+	}
+
 	paths, exec, err := parseArgs(os.Args[1:])
 	if err != nil {
-		log.Fatalf("Error: %s\n\n%s\n", err.Error(), usage)
+		fmt.Printf("Error: %s\n\n%s\n", err.Error(), usage)
+		os.Exit(1)
 	}
 
 	// Create new watcher.
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	defer watcher.Close()
 
@@ -67,7 +73,8 @@ func main() {
 	for _, path := range paths {
 		err := watcher.Add(path)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 	}
 
@@ -81,7 +88,7 @@ func main() {
 				}
 				if event.Has(fsnotify.Write) {
 					log.Println("Modified:", event.Name)
-					log.Println("Executing", exec)
+					log.Println("Executing:", exec)
 					script.Exec(exec).Stdout()
 				}
 			case err, ok := <-watcher.Errors:
